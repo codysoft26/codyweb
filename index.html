@@ -10,30 +10,240 @@
             --card-bg: #111827;
             --border: #1f2937;
             --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.2);
             --text: #f3f4f6;
             --text-muted: #9ca3af;
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, sans-serif; background-color: var(--bg); color: var(--text); padding: 2rem 1rem; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
         .container { max-width: 900px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 3rem; }
-        .battery-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; }
-        .battery-icon { width: 40px; height: 20px; border: 2px solid var(--accent); border-radius: 3px; position: relative; padding: 2px; }
-        .battery-level { width: 60%; height: 100%; background: var(--accent); border-radius: 1px; }
-        h1 { font-size: 2.75rem; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.75rem; }
-        .subtitle { color: var(--text-muted); font-size: 1.2rem; }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Batería Vertical Grande */
+        .battery-widget {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .battery-top-cap {
+            width: 28px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 4px 4px 0 0;
+        }
+
+        .battery-body {
+            width: 80px;
+            height: 160px;
+            border: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 4px;
+            position: relative;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .battery-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(0deg, #38bdf8 0%, #818cf8 100%);
+            border-radius: 8px;
+            transition: height 0.5s ease-in-out, background 0.5s ease-in-out;
+        }
+
+        .battery-percentage {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .battery-details {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        h1 {
+            font-size: 2.75rem;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        ul { list-style: none; }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="battery-wrapper">
-                <div class="battery-icon"><div class="battery-level"></div></div>
-                <span style="color: var(--text-muted); font-size: 0.9rem;">60% restante</span>
+            <div class="battery-widget">
+                <div class="battery-top-cap"></div>
+                <div class="battery-body">
+                    <div id="battery-fill" class="battery-fill"></div>
+                </div>
+                <div id="battery-pct" class="battery-percentage">--%</div>
+                <div id="battery-details" class="battery-details">Calculando tiempo restante del día...</div>
             </div>
+
             <h1>NullClaw Architecture</h1>
             <p class="subtitle">Explorando Agentes Autónomos y Webhooks en Tiempo Real</p>
         </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🤖 ¿Cómo funcionan los Agentes?</h2>
+                <p>Los agentes de NullClaw combinan modelos de lenguaje avanzados con bucles de razonamiento iterativo y herramientas del sistema operativo.</p>
+                <ul>
+                    <li><strong>Contexto persistente:</strong> Memoria estructurada (SQLite/Híbrida) que evoluciona con cada interacción.</li>
+                    <li><strong>Tool Use autónomo:</strong> Ejecución controlada de shell, llamadas HTTP, gestión git y utilidades.</li>
+                    <li><strong>Personalidad y directrices:</strong> Identidades definidas en archivos modulares (SOUL.md, AGENTS.md).</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>⚡ ¿Cómo funcionan los Webhooks?</h2>
+                <p>El canal Webhook permite conectar servicios externos, pasarelas y aplicaciones de terceros de forma síncrona o asíncrona.</p>
+                <ul>
+                    <li><strong>Recepción de eventos:</strong> Captura peticiones HTTP POST con payloads JSON estructurados.</li>
+                    <li><strong>Disparadores automáticos:</strong> Activan subtareas, notificaciones (Pushover) o respuestas automatizadas.</li>
+                    <li><strong>Integración multicanal:</strong> Conecta flujos externos directamente con las sesiones del agente.</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Potenciado por NullClaw • Desplegado en GitHub Pages</p>
+        </footer>
     </div>
+
+    <script>
+        function updateDayBattery() {
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+            
+            const totalMs = endOfDay - startOfDay;
+            const remainingMs = Math.max(0, endOfDay - now);
+
+            const remainingPct = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100));
+            
+            const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+            const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+
+            const fillEl = document.getElementById('battery-fill');
+            const pctEl = document.getElementById('battery-pct');
+            const detailsEl = document.getElementById('battery-details');
+
+            fillEl.style.height = remainingPct.toFixed(1) + '%';
+            pctEl.textContent = Math.round(remainingPct) + '%';
+            detailsEl.textContent = `Quedan ${remainingHours}h ${remainingMinutes}m para terminar el día`;
+
+            // Cambiar color cuando la batería se agota (menos del 20% en rojo, 50% amarillo)
+            if (remainingPct <= 20) {
+                fillEl.style.background = 'linear-gradient(0deg, #ef4444 0%, #f97316 100%)';
+            } else if (remainingPct <= 50) {
+                fillEl.style.background = 'linear-gradient(0deg, #eab308 0%, #38bdf8 100%)';
+            } else {
+                fillEl.style.background = 'linear-gradient(0deg, #38bdf8 0%, #818cf8 100%)';
+            }
+        }
+
+        updateDayBattery();
+        setInterval(updateDayBattery, 10000);
+    </script>
 </body>
 </html>
